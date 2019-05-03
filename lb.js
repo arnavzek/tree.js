@@ -168,7 +168,7 @@
 
             oldDom.uuid == null? init('html') :  init('3d')
             
-             
+            //text node exist in the first case because whole div is appended
 
             function lp_array(od,nd){
 
@@ -179,12 +179,14 @@
                 var appendPoint = od.length;// appendChild() removes the object from new object
                 var removePoint = nd.length;//  removing will reset array length
 
-                // if(len == 0){return}
+                if(len == 0){}else{
 
                 for(i = 0; i < len; i++){
 
+                    // console.log(newDom.tagName)
+                    // console.log(newDom.tagName,len,i)
+
                     if (!od[i]){
-                   
                         ad(nd[appendPoint])//new item was added to the state
                     }else if(!nd[i]){
                         rm(od[removePoint])// item was removed in the new state 
@@ -197,6 +199,8 @@
 
                 }
 
+                }
+
             }
 
             function up_attr(key){
@@ -206,20 +210,22 @@
 
             // to do: update childNodes
 
-            for (key in newDom){
+                if ( newDom['childNodes'][0] !== undefined && newDom['childNodes'][0].nodeName == "#text") {
+                    
 
-                let txtbool = false;
+                        // oldDom['childNodes'][i].data = newDom['childNodes'][i].data
+                        // lp_array(oldDom['childNodes'],newDom['childNodes'])
 
-                if ( key == 'childNodes' && newDom['childNodes'][0] !== undefined ) {
-                    if ( newDom['childNodes'][0].nodeName == "#text" ) {
-                        txtbool = true
-                        // console.log(newDom['childNodes'][0])
-                    }
-                }else{
-                    txtbool = false
+                        render( oldDom['childNodes'][0],newDom['childNodes'][0] )
+                        // to do: why recursion increses so much if loop array is called
                 }
 
-                (key == 'children' || txtbool == true ) ? lp_array(oldDom[key],newDom[key]) : up_attr(key)
+
+            //
+
+            for (key in newDom){
+
+                (key == 'children' ) ? lp_array(oldDom[key],newDom[key]) : up_attr(key)
             }
         }
 
@@ -397,33 +403,22 @@
     function Dom_scan(obj) {
 
         // to do: how if the object is being rendered for the first time, trigger on start
-        // obj.scan()
 
         let object = obj.ui()
-
-        //GET THE BUILD CONTENT COMPARE IT TO THE CHILD OBJECT
-        //MAKE CHANGES IF THE 
-
         let build_array = obj.build
-
-
         var childer = obj['child']
 
         function hn(){
 
+            if(childer == undefined){
+                childer = []
+            }
 
-        if(childer == undefined){
+            if(build_array == undefined){
+                build_array = []
+            }
 
-            childer = []
-
-        } 
-
-        if(build_array == undefined){
-
-            build_array = []
-
-        } 
-    }
+        }
 
         hn()
 
@@ -431,12 +426,13 @@
 
         build_array.length > childer.length? loop_c = build_array.length : loop_c = childer.length
 
-        
+        console.log(counter.local)
 
         for (var i = 0; i < loop_c; i++) {
 
             if(!childer[i]){
 
+                // delete build_array[i];
                 obj.add( build_array[i] )
                 obj.child[i].init()
                 // console.log( obj.child[i].local )
@@ -467,20 +463,16 @@
 
 
         }
-        
-        // console.log(obj.child[0].local)
-        // console.log(obj.child[1].local)
 
-         var childer = obj['child']
-         hn()
+        console.log(counter.local)
 
+        var childer = obj['child']
+        hn()
 
 
-            for(i=0; i<childer.length; i++){
-                // console.log(i)
-
-                object.appendChild( Dom_scan(childer[i]))
-            }
+        for(i=0; i<childer.length; i++){
+            object.appendChild( Dom_scan(childer[i]) )
+        }
 
 
          //
@@ -544,10 +536,15 @@
                 this.origin == undefined? this.origin = 'app':null
 
                 //update html dom
+
+               
+
                 render( document.getElementsByTagName(this.origin)[0],
+
                     Dom_scan(this)
                 )
 
+                
                 //update space dom
                 // render(body.dimension.state, this.state.space.content)
             },
@@ -633,19 +630,7 @@
             // pb: addCount gets executed on object instantiation
             
             ui:function(){
-                return $('div', 
-
-                    { text: this.state.count,
-
-                     childs:[
-
-                      $('button', { text:'add', onClick: this.local+'.addCount()' } )   
-
-                      ] 
-
-
-
-                })
+                return $('button', { text:this.state.count, onClick: this.local+'.addCount()' } ) 
             },
 
             init:function(){
@@ -676,19 +661,48 @@
             // pb: addCount gets executed on object instantiation
             
             ui:function(){
-                return $('div', 
-
-                    { text: this.state.count,
-
-                     childs:[
-
-                      $('button', { text:'add', onClick: this.local+'.addCount()' } )   
-
-                      ] 
+                return $('button', { text:this.state.count, onClick: this.local+'.addCount()' } )   
 
 
 
-                })
+
+               
+            },
+
+            init:function(){
+                this.state = {}
+                this.state.count = 0
+                // console.log(this.local,counter.local)
+
+            }
+            
+
+          })
+
+
+        addon({
+
+            name: "counter3",
+
+            addCount: function(){
+
+                // this.state.count = this.state.count+1;
+
+                // app.render()
+                console.log(this.state.count)
+                this.setState({count: this.state.count+1 })
+
+            },
+
+            // pb: addCount gets executed on object instantiation
+            
+            ui:function(){
+                return $('button', { text:this.state.count, onClick: this.local+'.addCount()' } )   
+
+
+
+
+               
             },
 
             init:function(){
@@ -713,10 +727,23 @@
     // make a custom function that define the exception
     // let ko = counter;
 
+    // Object.freeze(counter)
+
+    function new_(obj){
+
+        var newObj = {}
+
+        for(key in obj){
+            newObj[key] = obj[key]
+        }
+
+        return newObj
+    }
+
     app.set({
 
         origin: 'app',
-        build: [counter,counter2]
+        build: [new_(counter),new_(counter),new_(counter)]
 
     })
 
