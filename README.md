@@ -1,6 +1,6 @@
 # tree.js
 
-a good starting point if you want to make your own reactive library like react.js, with cold simple vanilla js
+A good starting point if you want to make your own reactive library like react.js, with cold simple vanilla js
 
 
 efficient with the most minimal code. that's a little exaggerated cause you are here and you can do better
