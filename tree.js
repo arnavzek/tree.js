@@ -1,47 +1,3 @@
-        util = {
-
-            detach: function ( child, parent, scene ) {
-
-                child.applyMatrix( parent.matrixWorld );
-                parent.remove( child );
-                scene.add( child );
-
-            },
-
-            attach: function ( child, scene, parent ) {
-
-                child.applyMatrix( new THREE.Matrix4().getInverse( parent.matrixWorld ) );
-
-                scene.remove( child );
-                parent.add( child );
-
-            }
-
-        };
-
-
-
-
-
-
-        function KeyExist(word){
-
-            var count = 0;
-
-            for( names in body ){
-                if (word == names) {count++}
-            }
-
-            return count;
-        }
-
-        // format key in array
-
-        function fncall(key){
-
-        }
-
-
 
         function applyAtribute(element,attributes){
 
@@ -78,112 +34,12 @@
             return applyAtribute( document.createElement(element),attributes )
         }
 
-        //to be revamped into dynamic auto generate function with the name of html tag itself
-
-        // function __(id,what){
-
-        //     what == 'class'? return(document.getElementsByClassName(id)[0]) : return (document.getElementById(id))
-        // }
-
-        function C(location){
-            var locationArray = location.split('.')
-            return locationArray[locationArray.length - 1]
-        }
-
-        function ___(key,object,prop){
-
-            eval("body."+key+" = object")
-
-            // eval("body."+key+".state.location = body."+key)
-            // console.log(object)
-            eval( "var bodyIntermediate = body."+key)
-            // console.log(bodyIntermediate)
-            // we can't associate body with key for a setter function because it becomes an object (so it needs to be outside eval)
-            // location was initialized as an object
-            bodyIntermediate.state = {}
-            bodyIntermediate.local = "body."+key
-            bodyIntermediate.key = C(key)
-
-            return eval("body."+key+".onStart(prop)")
- 
-        }
 
 
-        //addon array will be downloaded from the server and save it into local storage
-        function P(location){
-            var locationArray = location.split('.')
-            return locationArray[locationArray.length - 2]
-        }
-
-
-
-        var addon = {}
-
-
-        function locally(what,data){
-            return what.local.replace(/body./gi,'')+"."+data
-        }
-
-
-
-        function ARlength(ar) {
-
-                    if ( !Array.isArray(ar) ) {
-                        return 0;
-                    }
-                    //object array length
-                    var i = 0;
-
-                    for( val in ar){
-                        i++
-                    }
-
-                    return i;
-        }
-
-        // to do: text content update
-
-        function update_childnode(od,nd,dom){
-
-             
-
-                var len;
-                od.length > nd.length? len = od.length : len = nd.length;// which is bigger new array or old array
-
-                        
-                var appendPoint = od.length;// appendChild() removes the object from new object
-                var removePoint = nd.length;//  removing will reset array length
-
-
-
-
-                for (var i = 0; i < len; i++) {
-
-
-                    // console.log('a')
-
-                    if (!od[i]){
-                        dom.addChild(nd[appendPoint])//new item was added to the state
-                    }else if(!nd[i]){
-                        dom.removeChild(od[removePoint])// item was removed in the new state 
-                    }else{
-                        od[i].data = nd[i].data
-                    }                         
-                                
-                }
-
-
-
-
-                
-
-            }
-
-            var c = 0;
 
         function render(oldDom,newDom){
 
-            c++
+    
             
             function init(type) {
 
@@ -262,82 +118,6 @@
 
         }
 
-
-
-        //whenever set state is called like setstate(body, editor.mousestatus) call the render method associated with object
-
-        //how set state and can be ubiquitous around all ___() | sol: render function as an object will return the new obj
-        //___() should take (prop)
-
-        //how to update space as it is a secondary child and has a lot of exceptions
-
-        //key is the unique name
-
-        function say(path,data){
-
-            for(key in data){
-                path.state[key] = data[key]
-            }
-
-            path.render()
-            // console.log(path);
-        }
-
-
-
-
-        // to do: child class is not updating
-
-        addon.editmode = {
-
-            onStart: function(prop){
-
-                return(
-
-                    $('button',{
-                        onClick:this.local+".onPresorigin()",
-                        text:prop.class,
-                        class:prop.class+"k"
-
-                    })
-
-                )
-
-            },
-
-            onPresorigin: function (){
-                console.log('error')
-            }
-        }
-
-
-        addon.space = {
-
-            init: function(argument) {
-
-                this.state = { children: [] }
-                this.state.children[0] = new THREE.Scene();
-                this.state.children[1] = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 3000 );
-                this.state.children[2] = new THREE.WebGLRenderer({ antialias: true });
-
-                const animate = () => {
-                    requestAnimationFrame( animate );
-                    this.state.children[2].render( this.state.children[0], this.state.children[1] );
-                };
-
-                animate(this);
-
-                body.state.space.content = this.state;
-            },
-
-            onStart: function(prop) {
-
-                this.state.children == undefined ? this.init():null;
-                return this.state.children[2].domElement
-                
-            },
-
-        }
 
     function set_x(nw,obj) {
 
@@ -533,26 +313,21 @@
 
     var app = {
 
-            state: {mode: 'editor' , editor:{class:'menu'} , space:{ helpers:[] , content:{} } },
+            state: {},
             local:'app',type:'controller',
 
-            //download state
             render:function (){
 
                 this.origin == undefined? this.origin = 'app':null
 
-                //update html dom
-
                
-
                 render( document.getElementsByTagName(this.origin)[0],
 
                     Dom_scan(this)
                 )
 
                 
-                //update space dom
-                // render(body.dimension.state, this.state.space.content)
+
             },
 
             ui:()=>{
@@ -591,17 +366,15 @@
 document.addEventListener("DOMContentLoaded",  app.init() )
 
 
-    // app.init()
 
 
 
 
-    
 
 
-// the form of component
-// pre built component
-// to do fix return
+
+
+
 
 
 function main(){
@@ -626,37 +399,6 @@ function main(){
 
 
 
-
-
-        addon({
-
-            name: "counter2",
-
-            addCount: function(){
-
-                // this.state.count = this.state.count+1;
-
-                // app.render()
-                console.log(this.state.count)
-                this.setState({count: this.state.count+1 })
-
-            },
-
-            // pb: addCount gets executed on object instantiation
-            
-            ui:function(){
-                return $('button', { text:this.state.count, onClick: this.local+'.addCount()' } ) 
-            },
-
-            init:function(){
-                this.state = {}
-                this.state.count = 0
-                console.log(this)
-
-            }
-            
-
-          })
 
 
         addon({
@@ -741,7 +483,7 @@ function main(){
       app.set({
 
         origin: 'app',
-        build: [counter3,counter3,counter3,counter]
+        build: [counter3,counter3,counter3]
 
     }) 
 
