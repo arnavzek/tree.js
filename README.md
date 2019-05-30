@@ -1,19 +1,13 @@
-# tree.js
+# Tree.js
 
-A good starting point if you want to make your own reactive library like react.js, with cold simple vanilla js
+A good starting point if you want to make your own reactive library like react.js, with cold simple vanilla js & without classes
+
+how to use: in the main function(){
 
 
-efficient with the most minimal code. that's a little exaggerated cause you are here and you can do better
 
-code is self explanable
-
-how to use
-in the main function(){
-
-you declare a new component with addon()
-
-        addon({
-            name: "counter", // (this will be variable we will call in the main tree)
+        twig({ 
+            name: "counter", //you declare a new component with twig()
 
             addCount: function(){
                 this.setState({count: this.state.count+1}) // our sweet setState 
@@ -21,21 +15,23 @@ you declare a new component with addon()
             
             ui:function(){
                 return $('button', {
-                  text:this.state.count, onClick: this.local+'.addCount()' } ) 
-            },  //(you don't need to touch html)
-
-            init:function(){ default value for state}
+                  text:this.state.count, onClick: addCount 
+                } ) 
+            },
             
           })
 
-and add that to the main tree by simply putting the variable
-
-    app.set({
-
-        origin: html element,
-        build: [counter] (you just call the varible, told ya and .set if you like variety)
-
+    tree({
+        build: [ counter() ] //counter can have build method and it's childs and it's child can have child... quite like html but with js and
+                             //you can pass in new functionality as parameters
     }) 
-
-
+        
+        
 }
+
+check out todo_app.html
+
+#Benefits over conventional react library
+        *It doesn't depend on prop instead you use this.parent, so twigs(components) are easily swappable
+        *all method of the component are binded by default
+        *components are real functions, pass methods as parameter and it will be applied to the twig
