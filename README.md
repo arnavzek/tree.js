@@ -4,28 +4,26 @@ A good starting point if you want to make your own reactive library like react.j
 
 how to use: in the main function(){
 
+twig({ 
+   name: "counter", //you declare a new component with twig()
 
-
-        twig({ 
-            name: "counter", //you declare a new component with twig()
-
-            addCount: function(){
-                this.setState({count: this.state.count+1}) // our sweet setState 
-            },
+   addCount: function(){
+       this.setState({count: this.state.count+1}) // our sweet setState 
+   },
             
-            ui:function(){
-                return $('button', {
-                  text:this.state.count, onClick: addCount 
-                } ) 
-            },
+   ui:function(){
+       return $('button', {
+         text:this.state.count, onClick: addCount 
+       } ) 
+   },
             
-          })
+ })
 
-    tree({
-        build: [ counter() ] //counter can have build method and it's childs and it's child can have child... quite like html but with js and
-                             //you can pass in new functionality as parameters
-    }) 
-        
+ tree({
+       build: [ counter() ] //counter can have build method and it's childs and it's child can have child... quite like html but with js and
+                            //you can pass in new functionality as parameters
+   }) 
+
         
 }
 
