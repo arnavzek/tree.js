@@ -3,7 +3,7 @@
 A good starting point if you want to make your own reactive library like react.js, with cold simple vanilla js & without classes
 
 how to use: in the main function(){
-
+```
 twig({ 
    name: "counter", //you declare a new component with twig()
 
@@ -26,7 +26,7 @@ twig({
 
         
 }
-
+```
 check out todo_app.html
 
 #Benefits over conventional react library
