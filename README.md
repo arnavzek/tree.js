@@ -29,7 +29,8 @@ twig({
 ```
 check out todo_app.html
 
-#Benefits over conventional react library
-        *It doesn't depend on prop instead you use this.parent, so twigs(components) are easily swappable
-        *all method of the component are binded by default
-        *components are real functions, pass methods as parameter and it will be applied to the twig
+#Benefits over conventional react library<br>
+        *It doesn't depend on prop instead you use this.parent, so twigs(components) are easily swappable<br>
+        *all method of the component are binded by default<br>
+        *components are real functions, pass methods as parameter and it will be applied to the twig<br>
+<br>
