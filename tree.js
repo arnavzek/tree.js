@@ -15,9 +15,13 @@
 
             for( att in attributes ){
 
-                if (att == 'text') {
-                        element.appendChild( document.createTextNode(attributes[att]) )
-                }else{ att == 'childs' ?  addchild(attributes[att]) : element.setAttribute(att,attributes[att]) }
+                var atb = attributes[att]
+
+                if (att.toLowerCase().indexOf('on') !== -1) {
+                    element.addEventListener(att.toLowerCase().replace('on',''), atb )
+                }else if (att == 'text'){
+                    element.appendChild( document.createTextNode(atb) )
+                }else{ att == 'childs' ?  addchild(atb) : element.setAttribute(att,atb) }
                 
                 
                 
@@ -31,7 +35,7 @@
 
 
         function $(element,attributes){
-            return applyAtribute( document.createElement(element),attributes )
+            return applyAtribute( document.createElement(element),attributes)
         }
 
 
@@ -85,13 +89,13 @@
                 for(let i = 0; i < len; i++){
                     
                     if (!od[i]){
-                        console.log( nd,'a')
+                        // console.log( nd,'a')
                         ad(nd[appendPoint])//new item was added to the state, the new function can also be used
                     }else if(!nd[i]){
-                        console.log( nd,'b')
+                        // console.log( nd,'b')
                         rm(od[removePoint])// item was removed in the new state 
                     }else{
-                        console.log(len,i,nd[i].tagName)
+                        // console.log(len,i,nd[i].tagName)
                           render( od[i], nd[i] )
                         // problem found: when a child is in the loop for loop doesn't proceeds
                         
@@ -119,16 +123,6 @@
         }
 
 
-    function set_x(nw,obj) {
-
-            for(key in obj){
-
-                key.toLowerCase() == 'child'? null : nw[key] = obj[key]
-
-            }
-
-            return nw;
-    }
 
     var cooler = {
 
@@ -142,34 +136,14 @@
             //call event var event = new Event('build');
         },
 
-        parent:function(obj){
-            return eval(obj.local)
-            // to do replace [xx]
-        },
+        add: function(arg) {
 
-        add: function(...arg) {
+            if (this.child == undefined) this.child = []
 
-            if (this.child !== undefined) {
-                // len = this.child.length
-            }else{
-                this.child = []
-            }
-                
-            arg[0].constructor === Array? arg = arg[0] :null
+            arg.parent = this
+            this.child.push(arg)
 
-            for(i=0; i<arg.length; i++){
-
-                this.child.push(arg[i])
-
-                // console.log()
-                // var len = this.child.length
-
-                // this.child[this.child.length-1].init()
-
-                this.child[this.child.length-1].local = this.local+".child["+(this.child.length -1)+"]"
-
-                // how to access parent's data
-             }
+             
 
 
         },
@@ -177,17 +151,12 @@
         // to do state can also passed by using find, 'key' feature
 
         set: function(obj){
+    
+            for(key in obj){
 
-
-            if (this.type == 'controller') {
-                return set_x(this,obj)
-            }else{
-                var nw = this
-                return  set_x(nw,obj)
+                key.toLowerCase() == 'child'? null : this[key] = obj[key]
 
             }
-            
-
 
         },
 
@@ -217,15 +186,26 @@
 
         var newObj = {}
 
-        for(key in obj){ newObj[key] = obj[key] }
+        for(key in obj){
+            newObj[key] = obj[key]
+            if ( typeof obj[key] == 'function') newObj[key] = obj[key].bind(newObj)
+        }
 
+        //auto binding
+        //using classes will simplify this
         return newObj
     }
 
     function Dom_scan(obj) {
 
         let object = obj.ui()
-        var build_array = obj.build
+
+
+        var build_array = undefined
+        
+        if (obj.build) typeof obj.build == 'object'? build_array = obj.build : build_array = obj.build()
+
+        
         var childer = obj['child']
 
 
@@ -239,8 +219,10 @@
         for (var i = 0; i < loop_c; i++) {
 
             if(!childer[i]){
+
                 obj.add( new_(build_array[i]) )
-                obj.child[i].init()
+                if(obj.child[i].init) obj.child[i].init()
+
             }else if(!build_array[i]){
                 // obj.remove(i)
             }else{
@@ -263,44 +245,7 @@
         for(i=0; i<childer.length; i++){
             object.appendChild( Dom_scan(childer[i]) )
         }
-
-         // function parseOnClick(chart){
-
-
-         //     for(key in chart){
-
-                
-
-         //        if (key.toLowerCase() == 'onclick'){
-
-         //            console.log( chart[key] )
-                    
-         //        }else if(key == 'children'){
-
-         //            // console.log( object['children'] )
-
-         //            function recurse(){
-
-         //                for( i=0; i < object['children'].length ; i++){
-
-         //                    // console.log(object['children'][i]) 
-
-         //                    parseOnClick(object['children'][i])
-         //                }
-
-         //            }
-
-         //            object['children'].length !== 0? recurse() : null
-
-         //        }
-
-         //     }
-         // }
-
          
-         // parseOnClick(object)
-
-         //on click parse
 
         return object
 
@@ -313,15 +258,24 @@
 
     var app = {
 
-            state: {},
-            local:'app',type:'controller',
+            state: {},name:'tree',
 
             render:function (){
 
                 this.origin == undefined? this.origin = 'app':null
 
-               
-                render( document.getElementsByTagName(this.origin)[0],
+                let element_seed = document.getElementById(this.origin)
+                
+                if (!element_seed){
+
+                    let newele = document.createElement('div'); 
+                    newele.setAttribute('id','app')
+                    document.body.appendChild(newele )
+                    element_seed = newele
+
+                } 
+
+                render(element_seed,
 
                     Dom_scan(this)
                 )
@@ -339,11 +293,12 @@
             init: function() {
 
                 for(key in cooler){
-                    this[key] = cooler[key]
+                    app[key] = cooler[key]
                 }
 
+                twig(app)
                 main()
-                this.render()
+                app.render()
 
             }
 
@@ -351,144 +306,33 @@
 
     }
 
-    function _($){
+
+
+    twig = (object) =>{
+
         for(key in cooler){
-            $[key] = cooler[key]
+            object[key] = cooler[key]
         }
 
-        return $;
+        object.state = {}
+        
+
+        window[object.name] = function(obj){
+
+            let main_obj = object;
+
+            for (key in obj){
+                main_obj[key] = obj[key]
+            }
+
+            return main_obj
+        }
+
+        // window[object.name] = object;
     }
 
-    addon = (object) =>{
-        window[object.name] = _(object);
-    }
 
-document.addEventListener("DOMContentLoaded",  app.init() )
-
-
-
-
-
-
-
-
-
-
-
-
-
-function main(){
-
-
-
-
-    addon({
-
-            name: "inputBox",
-
-            start: function(){
-                this.state = parent(this).state
-            },
-            
-            ui:()=>{
-                return $('input', { value: this.text })
-            }
-            
-
-          })
-
-
-
-
-
-        addon({
-
-            name: "counter",
-
-            addCount: function(){
-
-                // this.state.count = this.state.count+1;
-
-                // app.render()
-                console.log(this.state.count)
-                this.setState({count: this.state.count+1 })
-
-            },
-
-            // pb: addCount gets executed on object instantiation
-            
-            ui:function(){
-                return $('button', {
-
-                 text:this.state.count, onClick: this.local+'.addCount()'
-         
-
-                } )   
-
-
-                // whenever the render function is called the old data is lost
-
-               
-            },
-
-            init:function(){
-                this.state = {}
-                this.state.count = 0
-                // console.log(this.local,counter.local)
-
-            }
-            
-
-          })
-
-
-        addon({
-
-            name: "counter3",
-
-            addCount: function(){
-
-                // this.state.count = this.state.count+1;
-
-                // app.render()
-                console.log(this.state.count)
-                this.setState({count: this.state.count+1 })
-
-            },
-
-            // pb: addCount gets executed on object instantiation
-            
-            ui:function(){
-
-                return $('span',{
-
-                    text:this.state.count,
-                    childs:[ $('button', { text:'Go '+this.state.count, onClick: this.local+'.addCount()' })  ]
-
-                    }
-                )
-            },
-
-            init:function(){
-                this.state = {}
-                this.state.count = 0
-                console.log(this)
-
-            }
-            
-
-          })
-
-
-      app.set({
-
-        origin: 'app',
-        build: [counter3,counter3,counter3]
-
-    }) 
-
-}
-
+    document.body.onload = app.init
 
    
 

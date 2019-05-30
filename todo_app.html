@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<body>
+</body>
+
+    <script type="text/javascript" charset="UTF-8" src="tree.js"></script>
+    <script type="text/javascript">
+    	
+    	function main(){
+
+	    twig({
+
+	            name: "inputBox",
+
+	            keypress:function(event){
+	            	
+	            	var tmp = this.parent.state.value
+	            	
+
+	            	if (event.key == 'Enter'){
+	            		tmp.push(event.target.value)
+	            		this.parent.setState({value:tmp})
+	            		event.target.value = ''
+	            	}
+
+
+	            },
+	            
+	            ui:function(){
+	                return $('input', { onkeypress: this.keypress,placeholder: this.placeholder })
+	            }
+	            
+	          })
+
+
+	    	twig({
+	    		name:'view',
+	    		ge:function(){
+
+	    			let a = []
+
+	    			for(index of this.parent.state.value ){
+	    				a.push( $( 'li',{ text:index } ) )
+	    			}
+
+	    			return a
+	    			
+	    		},
+	    		
+	    		ui:function(){
+	    			return $('ul',{childs:
+	    				this.ge() 
+	    				})
+	    		}
+	    	})
+
+
+	        twig({
+
+	            name: "counter",
+
+	            addCount: function(event){
+	            	//here this will be redefined
+	                // console.log(this)
+	                // console.log(this.state.count)
+	                this.setState({count: this.state.count+1 })
+
+	            },
+
+	            // pb: addCount gets executed on object instantiation
+	            
+	            ui:function(){
+
+	                return $('button', {
+
+	                 text:this.state.count, onClick:this.addCount
+	                })  
+
+	            },
+
+	            init:function(){
+	                this.state.count = 0
+	            }
+	            
+	          })
+
+	    tree({
+	    	state:{ value:[] },
+	    	build:[ inputBox({placeholder:'press enter to add'}),view() ]
+	    })
+
+	}
+
+
+	//make twigs functions
+
+
+    </script>
+</html>
