@@ -34,3 +34,7 @@ check out todo_app.html
         *all method of the component are binded by default<br>
         *components are real functions, pass methods as parameter and it will be applied to the twig<br>
 <br>
+
+#wip
+three.js canvas support
+new diffing algorithm
